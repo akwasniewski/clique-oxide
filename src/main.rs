@@ -1,7 +1,11 @@
 use CliqueOxide::run;
-mod graph;
+use crate::graph::Graph;
 
+mod graph;
 fn main() {
-    pollster::block_on(run());
+    let graph = Graph::new(5);
+    //graph.draw();
+    let(vertices, indices) = graph.get();
+    pollster::block_on(run(vertices, indices));
 }
 

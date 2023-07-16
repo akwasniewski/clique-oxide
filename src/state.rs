@@ -1,7 +1,7 @@
 use wgpu::util::DeviceExt;
 use winit::event::WindowEvent;
 use winit::window::Window;
-use crate::{INDICES, Vertex, VERTICES};
+use crate::{VisualVertex};
 
 pub struct State {
     surface: wgpu::Surface,
@@ -14,7 +14,6 @@ pub struct State {
     vertex_buffer: wgpu::Buffer,
     index_buffer: wgpu::Buffer,
     num_indices: u32,
-
 }
 
 impl State {
@@ -77,7 +76,7 @@ impl State {
 }
 impl State {
     // ...
-    pub(crate) async fn new(window: Window) -> Self {
+    pub(crate) async fn new(window: Window, vertices: Vec<VisualVertex>, indices: Vec<u16>) -> Self {
         let size = window.inner_size();
 
         // The instance is a handle to our GPU
@@ -149,7 +148,7 @@ impl State {
                 module: &shader,
                 entry_point: "vs_main", // 1.
                 buffers: &[
-                    Vertex::desc(),
+                    VisualVertex::desc(),
                 ],
             },
             fragment: Some(wgpu::FragmentState { // 3.
@@ -185,18 +184,18 @@ impl State {
         let vertex_buffer = device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
                 label: Some("Vertex Buffer"),
-                contents: bytemuck::cast_slice(VERTICES),
+                contents: bytemuck::cast_slice(&vertices),
                 usage: wgpu::BufferUsages::VERTEX,
             }
         );
         let index_buffer = device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
                 label: Some("Index Buffer"),
-                contents: bytemuck::cast_slice(INDICES),
+                contents: bytemuck::cast_slice(&indices),
                 usage: wgpu::BufferUsages::INDEX,
             }
         );
-        let num_indices = INDICES.len() as u32;
+        let num_indices = indices.len() as u32;
         Self {
             window,
             surface,
@@ -208,6 +207,7 @@ impl State {
             vertex_buffer,
             index_buffer,
             num_indices,
+
         }
     }
 }
