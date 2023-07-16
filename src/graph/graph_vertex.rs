@@ -10,7 +10,7 @@ impl GraphVertex{
     pub(crate) fn new(label: i32) -> Self{
         let mut rng = rand::thread_rng();
         let connections=LinkedList::new();
-        let color=[0.0,0.0,0.0];
+        let color=[1.0,1.0,1.0];
         let position=[rng.gen_range(-1.0..1.0),rng.gen_range(-1.0..1.0),0.0];
         Self{
             label,
