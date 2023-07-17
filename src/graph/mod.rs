@@ -1,4 +1,5 @@
 mod graph_vertex;
+
 use std::vec::Vec;
 use CliqueOxide::visual_vertex::VisualVertex;
 use crate::graph::graph_vertex::GraphVertex;
@@ -23,8 +24,70 @@ impl Graph{
             edge_width,
         }
     }
-    pub fn draw(){
-        //change positions using forced based graph drawing
+    pub fn adjust_positions(&mut self){
+        let a:f32=2000.0*2000.0;
+        let threshold = 100000;
+        let graph_size=self.vertices.len();
+        let k: f32 =(a).sqrt()/(graph_size as f32);
+        let fr = |x: f32| -> f32 {k*k/x};
+        let fa = |x: f32| -> f32 { x*x/k };
+        let mut cooling: f32 = 1.0;
+        let cooldown: f32 = 0.999;
+        for i in 0..threshold{
+            let mut forces: Vec<[f32; 2]> = Vec::with_capacity(graph_size);
+            for i in 0..graph_size {
+                forces.push([0.0, 0.0]);
+            }
+            for cur in 0..graph_size{
+                for other in 0..graph_size{
+                    if cur!=other{
+                        if (self.vertices[cur].position[0]-self.vertices[other].position[0]).abs()<0.0001 &&
+                            (self.vertices[cur].position[1]-self.vertices[other].position[1]).abs()<0.0001 {
+                            if cur<other {
+                                forces[cur][0]+=400.0;
+                                forces[cur][1]+=400.0;
+                            }
+                            else{
+                                forces[cur][0]-=400.0;
+                                forces[cur][1]-=400.0;
+                            }
+                            continue;
+                        }
+                        let delta: f32 = ((self.vertices[cur].position[0]-self.vertices[other].position[0]).powf(2.0)+(self.vertices[cur].position[1]-self.vertices[other].position[1]).powf(2.0)).sqrt();
+                        let reaction = fr(delta);
+                        forces[cur][0]+=(self.vertices[cur].position[0]-self.vertices[other].position[0])/delta*reaction;
+                        forces[cur][1]+=(self.vertices[cur].position[1]-self.vertices[other].position[1])/delta*reaction;
+                    }
+                }
+                for other in &self.vertices[cur].connections{
+                    let other = *other as usize;
+                    if (self.vertices[cur].position[0]-self.vertices[other].position[0]).abs()<0.0001 &&
+                        (self.vertices[cur].position[1]-self.vertices[other].position[1]).abs()<0.0001 {
+                        continue;
+                    }
+                    let delta: f32 = ((self.vertices[cur].position[0]-self.vertices[other].position[0]).powf(2.0)+(self.vertices[cur].position[1]-self.vertices[other].position[1]).powf(2.0)).sqrt();
+                    let attraction = fa(delta);
+                    let force_x =(self.vertices[cur].position[0]-self.vertices[other].position[0])/delta*attraction;
+                    let force_y =(self.vertices[cur].position[1]-self.vertices[other].position[1])/delta*attraction;
+                    forces[cur][0]-= force_x;
+                    forces[cur][1]-= force_y;
+                    forces[other][0]+= force_x;
+                    forces[other][1]+= force_y;
+                }
+            }
+            for cur in 0..graph_size{
+                let force =(forces[cur][0].powf(2.0)+forces[cur][1].powf(2.0)).sqrt();
+                self.vertices[cur].position[0]+=forces[cur][0]*cooling;
+                self.vertices[cur].position[0] = f32::min(1000.0, f32::max(-1000.0,self.vertices[cur].position[0]));
+                self.vertices[cur].position[1]+=forces[cur][1]*cooling;
+                self.vertices[cur].position[1] = f32::min(1000.0, f32::max(-1000.0,self.vertices[cur].position[1]));
+            }
+            cooling*=cooldown;
+        }
+        for cur in 0..graph_size{
+            self.vertices[cur].position[0]/=1000.0;
+            self.vertices[cur].position[1]/=1000.0;
+        }
     }
     pub fn set_vertex_size(&mut self, vertex_size: f32){
         self.vertex_size=vertex_size/100.0;
@@ -33,7 +96,10 @@ impl Graph{
         self.edge_width=edge_width/200.0;
     }
     pub fn add_edge(&mut self, from: u32, to: u32){
-        self.vertices[from as usize].connections.push_back(to);
+        self.vertices[from as usize].connections.insert(to);
+    }
+    pub fn change_color(&mut self, edge_index: usize, color: [f32; 3]){
+        self.vertices[edge_index].color=color;
     }
     pub fn get(&self) -> (Vec<VisualVertex>, Vec<u16>){
         let mut visual_vertices: Vec<VisualVertex> = Vec::new();
