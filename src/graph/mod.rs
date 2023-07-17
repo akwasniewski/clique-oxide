@@ -1,5 +1,5 @@
 mod graph_vertex;
-
+use rand::Rng;
 use std::vec::Vec;
 use CliqueOxide::visual_vertex::VisualVertex;
 use crate::graph::graph_vertex::GraphVertex;
@@ -37,6 +37,29 @@ impl Graph{
             let mut forces: Vec<[f32; 2]> = Vec::with_capacity(graph_size);
             for i in 0..graph_size {
                 forces.push([0.0, 0.0]);
+            }
+            if i%20==0{
+                for cur in 0..graph_size{
+                    for other in 0..graph_size{
+                        if cur==other {continue;}
+                        for another in 0..graph_size{
+                            if cur==another || other==another {continue;}
+                            if(((self.vertices[another].position[1] - self.vertices[other].position[1]) *
+                                (self.vertices[other].position[0] - self.vertices[cur].position[0]) -
+                                (self.vertices[other].position[1] - self.vertices[cur].position[1])
+                                    * (self.vertices[another].position[0] - self.vertices[other].position[1])).abs()<0.0001){
+                                //colinear
+                                let mut rng = rand::thread_rng();
+                                self.vertices[cur].position[0]+=rng.gen_range(-1.0..1.0);
+                                self.vertices[cur].position[1]+=rng.gen_range(-1.0..1.0);
+                                self.vertices[other].position[0]+=rng.gen_range(-1.0..1.0);
+                                self.vertices[other].position[1]+=rng.gen_range(-1.0..1.0);
+                                self.vertices[another].position[0]+=rng.gen_range(-1.0..1.0);
+                                self.vertices[another].position[1]+=rng.gen_range(-1.0..1.0);
+                            }
+                        }
+                    }
+                }
             }
             for cur in 0..graph_size{
                 for other in 0..graph_size{

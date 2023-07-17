@@ -15,6 +15,7 @@ fn main() {
     graph.add_edge(2,5);
     graph.add_edge(3,5);
     graph.add_edge(4,5);
+    graph.add_edge(4,1);
     graph.adjust_positions();
     for vert in &graph.vertices{
         println!("{:?}", vert.position);
