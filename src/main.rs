@@ -6,16 +6,16 @@ mod graph;
 fn main() {
     let mut graph = Graph::new(6);
     graph.add_edge(0, 1);
-    graph.add_edge(1, 2);
-    graph.add_edge(2, 3);
-    graph.add_edge(3, 4);
-    graph.add_edge(4, 0);
-    graph.add_edge(0, 5);
+    graph.add_edge(1,2);
+    graph.add_edge(2,3);
+    graph.add_edge(3,4);
+    graph.add_edge(4,0);
+    graph.add_edge(0,5);
     graph.add_edge(1,5);
     graph.add_edge(2,5);
     graph.add_edge(3,5);
     graph.add_edge(4,5);
-    graph.add_edge(4,1);
+
     graph.adjust_positions();
     for vert in &graph.vertices{
         println!("{:?}", vert.position);
