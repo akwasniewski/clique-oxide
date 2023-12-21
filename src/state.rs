@@ -34,7 +34,10 @@ impl State {
     pub(crate) fn input(&mut self, event: &WindowEvent) -> bool {
         false
     }
-    pub(crate) fn update(&mut self) {
+    pub (crate) fn update(&self){}
+    pub(crate) fn update_positions(&mut self, vertices: Vec<VisualVertex>, indices: Vec<u16>) {
+        self.queue.write_buffer(&self.vertex_buffer, 0, bytemuck::cast_slice(&vertices));
+        self.queue.write_buffer(&self.index_buffer, 0, bytemuck::cast_slice(&indices));
     }
 
     pub(crate) fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
@@ -185,14 +188,14 @@ impl State {
             &wgpu::util::BufferInitDescriptor {
                 label: Some("Vertex Buffer"),
                 contents: bytemuck::cast_slice(&vertices),
-                usage: wgpu::BufferUsages::VERTEX,
+                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             }
         );
         let index_buffer = device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
                 label: Some("Index Buffer"),
                 contents: bytemuck::cast_slice(&indices),
-                usage: wgpu::BufferUsages::INDEX,
+                usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
             }
         );
         let num_indices = indices.len() as u32;

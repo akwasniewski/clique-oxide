@@ -4,17 +4,24 @@ use winit::{
     window::WindowBuilder,
 };
 mod state;
-pub mod visual_vertex;
+pub mod draw;
+pub mod graph;
 use crate::state::State;
 use wgpu::util::DeviceExt;
 use crate::visual_vertex::VisualVertex;
-pub async fn run(vertices: Vec<VisualVertex>, indices: Vec<u16>) {
+use crate::graph::*;
+pub async fn run(mut graph: Graph) {
+
     env_logger::init();
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new().with_title("Clique Oxide").build(&event_loop).unwrap();
+    let(vertices, indices) = graph.get();
     let mut state = State::new(window, vertices, indices).await;
 // run()
     event_loop.run(move |event, _, control_flow| {
+        graph.adjust_positions();
+        let(vertices, indices) = graph.get();
+        state.update_positions(vertices, indices);
         match event {
             Event::WindowEvent {
                 ref event,
