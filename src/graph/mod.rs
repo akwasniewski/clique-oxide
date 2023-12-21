@@ -8,6 +8,8 @@ use crate::graph::visual_vertex::VisualVertex;
 pub struct Graph{
     pub size: usize,
     pub vertices: Vec<GraphVertex>,
+    sqrt_size: f32,
+    pow_density: f32,
     vertex_size: f32,
     edge_width: f32,
     sim_runs: i32,
@@ -20,16 +22,18 @@ pub struct Graph{
 impl Graph{
     pub fn new(size: usize) -> Self{
         let mut vertices=Vec::new();
+        let mut sqrt_size = (size as f32).sqrt();
         //setting default display options
-        let mut vertex_size:f32=5.0/100.0;
+        let mut vertex_size:f32=1.0/100.0;
         let mut edge_width:f32=5.0/1000.0;
         //setting default simulation options
         let mut sim_runs:i32=100000;
-        let mut sim_cooldown:f32=0.999;
-        let mut sim_temperature=1.0;
+        let mut sim_cooldown:f32=0.9995;
+        let mut sim_temperature=0.001;
         let mut display_length:i32=2000;
         let mut display_height:i32=2000;
         let mut vertex_density:f32= ((display_height * display_length) as f32).sqrt()/(size as f32);
+        let mut pow_density = vertex_density*vertex_density;
         for i in 0..size{
             vertices.push(GraphVertex::new(i));
         }
@@ -43,7 +47,9 @@ impl Graph{
             sim_temperature,
             display_height,
             display_length,
-            vertex_density
+            vertex_density,
+            pow_density,
+            sqrt_size,
         }
     }
     pub fn from_snap(snap: &str, nodes: usize)->Graph{
@@ -54,6 +60,9 @@ impl Graph{
             res.add_edge(collected[i]-1, collected[i + 1]-1);
         }
         res
+    }
+    pub fn set_temperature(&mut self, new_temperature: f32){
+        self.sim_temperature=new_temperature;
     }
     pub fn set_vertex_size(&mut self, vertex_size: f32){
         self.vertex_size=vertex_size/100.0;
@@ -91,6 +100,9 @@ impl Graph{
             indices.push(*cur_indice+3); //bottom right
             *cur_indice+=4;
         }
+    }
+    pub fn size(&self)->usize{
+        self.size
     }
     fn generate_edges(&self, visual_vertices: &mut Vec<VisualVertex>, indices: &mut Vec<u16>, cur_indice: &mut u16){
         for cur in &self.vertices {

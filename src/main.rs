@@ -3,6 +3,7 @@ use CliqueOxide::graph::*;
 use std::thread;
 use std::time::Duration;
 use std::io;
+use rand::Rng;
 fn get_snap() -> (String, usize){
     let mut buffer = String::new();
     io::stdin().read_line(&mut buffer).unwrap();
@@ -19,14 +20,19 @@ fn get_snap() -> (String, usize){
     (res, nodes)
 }
 fn main() {
-    // const GRAPH_SIZE: usize = 30;
-    // let mut graph = Graph::new(GRAPH_SIZE);
-    // for i in 0..GRAPH_SIZE -1{
-    //     graph.add_edge(i, i+1);
-    // }
-    // graph.add_edge(GRAPH_SIZE-1,0);
-    let (snap, nodes) = get_snap();
-    let mut graph = Graph::from_snap(&snap, nodes);
+    let mut rng = rand::thread_rng();
+    const GRAPH_SIZE: usize = 100;
+    let mut graph = Graph::new(GRAPH_SIZE);
+    for i in 0..graph.size(){
+        for j in 0..graph.size(){
+            if rng.gen_range(0..GRAPH_SIZE) == 0 {
+                graph.add_edge(i,j);
+            }
+        }
+    }
+    graph.add_edge(GRAPH_SIZE-1,0);
+    // let (snap, nodes) = get_snap();
+    // let mut graph = Graph::from_snap(&snap, nodes);
     // for i in 0..10000{
     //     graph.adjust_positions();
     // }

@@ -19,9 +19,10 @@ pub async fn run(mut graph: Graph) {
     let mut state = State::new(window, vertices, indices).await;
 // run()
     event_loop.run(move |event, _, control_flow| {
-        graph.adjust_positions();
-        let(vertices, indices) = graph.get();
-        state.update_positions(vertices, indices);
+        if(graph.adjust_positions()){
+            let(vertices, indices) = graph.get();
+            state.update_positions(vertices, indices);
+        }
         match event {
             Event::WindowEvent {
                 ref event,

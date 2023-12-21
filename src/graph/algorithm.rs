@@ -54,6 +54,7 @@ impl Graph{
     fn calculate_attraction(&self, forces: &mut Vec<[f32; 2]>) {
         let graph_size=self.vertices.len();
         for cur in 0..graph_size{
+            let connections = self.vertices[cur].connections.len();
             for other in &self.vertices[cur].connections{
                 let other = *other as usize;
                 if (self.vertices[cur].position[0]-self.vertices[other].position[0]).abs()<0.0001 &&
@@ -61,7 +62,7 @@ impl Graph{
                     continue;
                 }
                 let delta: f32 = ((self.vertices[cur].position[0]-self.vertices[other].position[0]).powf(2.0)+(self.vertices[cur].position[1]-self.vertices[other].position[1]).powf(2.0)).sqrt();
-                let attraction = self.f_attr(delta);
+                let attraction = self.f_attr(delta)/connections as f32;
                 let force_x =(self.vertices[cur].position[0]-self.vertices[other].position[0])/delta*attraction;
                 let force_y =(self.vertices[cur].position[1]-self.vertices[other].position[1])/delta*attraction;
                 forces[cur][0]-= force_x;
@@ -72,19 +73,22 @@ impl Graph{
         }
     }
     fn f_rep(&self, delta: f32)->f32{
-        self.vertex_density*self.vertex_density/delta
+        self.pow_density*self.sqrt_size/delta
     }
     fn f_attr(&self, delta: f32)->f32{
         delta*delta/self.vertex_density
     }
-    pub (crate) fn adjust_positions(&mut self) {
+    pub (crate) fn adjust_positions(&mut self) ->bool {
+        if(self.sim_temperature<0.00001){
+            return false;
+        }
         let mut rng = rand::thread_rng();
         let graph_size = self.vertices.len();
         let mut forces: Vec<[f32; 2]> = Vec::with_capacity(graph_size);
         for i in 0..graph_size {
             forces.push([0.0, 0.0]);
         }
-        if rng.gen_range(0..23) == 0 {
+        if rng.gen_range(0..20) == 0 {
             self.handle_collinearities();
         }
         self.calculate_repulsion(&mut forces);
@@ -97,5 +101,6 @@ impl Graph{
             self.vertices[cur].position[1] = f32::min(1000.0, f32::max(-1000.0, self.vertices[cur].position[1]));
         }
         self.sim_temperature *= self.sim_cooldown;
+        return true;
     }
 }
