@@ -62,7 +62,7 @@ impl Graph{
                     continue;
                 }
                 let delta: f32 = ((self.vertices[cur].position[0]-self.vertices[other].position[0]).powf(2.0)+(self.vertices[cur].position[1]-self.vertices[other].position[1]).powf(2.0)).sqrt();
-                let attraction = self.f_attr(delta)/connections as f32;
+                let attraction = self.f_attr(delta)/(connections*connections) as f32;
                 let force_x =(self.vertices[cur].position[0]-self.vertices[other].position[0])/delta*attraction;
                 let force_y =(self.vertices[cur].position[1]-self.vertices[other].position[1])/delta*attraction;
                 forces[cur][0]-= force_x;
