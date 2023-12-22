@@ -1,4 +1,5 @@
 pub mod graph_vertex;
+pub mod builders;
 pub(crate) mod visual_vertex;
 
 mod setters;
@@ -27,7 +28,7 @@ impl Graph{
         let mut vertex_size:f32=1.0/100.0;
         let mut edge_width:f32=5.0/1000.0;
         //setting default simulation options
-        let mut sim_cooldown:f32=0.9995;
+        let mut sim_cooldown:f32=0.9999;
         let mut sim_temperature=0.003;
 
         let vertex_density:f32= ((2000 * 2000) as f32).sqrt()/(size as f32);
