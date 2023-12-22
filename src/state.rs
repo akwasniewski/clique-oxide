@@ -2,7 +2,7 @@ use wgpu::util::DeviceExt;
 use winit::event::WindowEvent;
 use winit::window::Window;
 use crate::{VisualVertex};
-
+use srgb::gamma::linear_from_u8;
 pub struct State {
     surface: wgpu::Surface,
     device: wgpu::Device,
@@ -15,7 +15,6 @@ pub struct State {
     index_buffer: wgpu::Buffer,
     num_indices: u32,
 }
-
 impl State {
     // Creating some of the wgpu types requires async code
     pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
@@ -47,6 +46,7 @@ impl State {
         let mut encoder = self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
             label: Some("Render Encoder"),
         });
+        let [rc,gc,bc] = linear_from_u8([84,153,132]);
         {
             let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Render Pass"),
@@ -55,10 +55,10 @@ impl State {
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 0.1,
-                            g: 0.2,
-                            b: 0.3,
-                            a: 1.0,
+                            r: rc as f64,
+                            g: gc as f64,
+                            b: bc as f64,
+                            a: 1.00,
                         }),
                         store: true,
                     },

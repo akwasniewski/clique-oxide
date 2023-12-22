@@ -3,7 +3,7 @@ fn are_collinear(v1: &GraphVertex, v2: &GraphVertex, v3: &GraphVertex)->bool{
     ((v3.position[1] - v2.position[1]) *
         (v2.position[0] - v1.position[0]) -
         (v2.position[1] - v1.position[1])
-            * (v3.position[0] - v2.position[1])).abs()<0.0001
+            * (v3.position[0] - v2.position[1])).abs()<0.00001
 }
 impl Graph{
      fn handle_collinearities(&mut self){
@@ -16,12 +16,12 @@ impl Graph{
                     if are_collinear(&self.vertices[cur], &self.vertices[other], &self.vertices[another]){
                         //colinear
                         let mut rng = rand::thread_rng();
-                        self.vertices[cur].position[0]+=rng.gen_range(-1.0..1.0);
-                        self.vertices[cur].position[1]+=rng.gen_range(-1.0..1.0);
-                        self.vertices[other].position[0]+=rng.gen_range(-1.0..1.0);
-                        self.vertices[other].position[1]+=rng.gen_range(-1.0..1.0);
-                        self.vertices[another].position[0]+=rng.gen_range(-1.0..1.0);
-                        self.vertices[another].position[1]+=rng.gen_range(-1.0..1.0);
+                        self.vertices[cur].position[0]+=rng.gen_range(-0.001..0.001);
+                        self.vertices[cur].position[1]+=rng.gen_range(-0.001..0.001);
+                        self.vertices[other].position[0]+=rng.gen_range(-0.001..0.001);
+                        self.vertices[other].position[1]+=rng.gen_range(-0.001..0.001);
+                        self.vertices[another].position[0]+=rng.gen_range(-0.001..0.001);
+                        self.vertices[another].position[1]+=rng.gen_range(-0.001..0.001);
                     }
                 }
             }
@@ -35,11 +35,11 @@ impl Graph{
                     if (self.vertices[cur].position[0] - self.vertices[other].position[0]).abs() < 0.0001 &&
                         (self.vertices[cur].position[1] - self.vertices[other].position[1]).abs() < 0.0001 {
                         if cur < other {
-                            forces[cur][0] += 400.0;
-                            forces[cur][1] += 400.0;
+                            forces[cur][0] += 0.4;
+                            forces[cur][1] += 0.4;
                         } else {
-                            forces[cur][0] -= 400.0;
-                            forces[cur][1] -= 400.0;
+                            forces[cur][0] -= 0.4;
+                            forces[cur][1] -= 0.4;
                         }
                         continue;
                     }
@@ -57,8 +57,8 @@ impl Graph{
             let connections = self.vertices[cur].connections.len();
             for other in &self.vertices[cur].connections{
                 let other = *other as usize;
-                if (self.vertices[cur].position[0]-self.vertices[other].position[0]).abs()<0.0001 &&
-                    (self.vertices[cur].position[1]-self.vertices[other].position[1]).abs()<0.0001 {
+                if (self.vertices[cur].position[0]-self.vertices[other].position[0]).abs()<0.001 &&
+                    (self.vertices[cur].position[1]-self.vertices[other].position[1]).abs()<0.001 {
                     continue;
                 }
                 let delta: f32 = ((self.vertices[cur].position[0]-self.vertices[other].position[0]).powf(2.0)+(self.vertices[cur].position[1]-self.vertices[other].position[1]).powf(2.0)).sqrt();
@@ -88,16 +88,16 @@ impl Graph{
         for _ in 0..graph_size {
             forces.push([0.0, 0.0]);
         }
-        if rng.gen_range(0..20) == 0 {
-            self.handle_collinearities();
-        }
+        // if self.sim_temperature>0.0001 && rng.gen_range(0..20) == 0 {
+        //     self.handle_collinearities();
+        // }
         self.calculate_repulsion(&mut forces);
         self.calculate_attraction(&mut forces);
         for cur in 0..graph_size {
             self.vertices[cur].position[0] += forces[cur][0] * self.sim_temperature;
-            self.vertices[cur].position[0] = f32::min(950.0, f32::max(-950.0, self.vertices[cur].position[0]));
+            self.vertices[cur].position[0] = f32::min(0.95, f32::max(-0.95, self.vertices[cur].position[0]));
             self.vertices[cur].position[1] += forces[cur][1] * self.sim_temperature;
-            self.vertices[cur].position[1] = f32::min(950.0, f32::max(-950.0, self.vertices[cur].position[1]));
+            self.vertices[cur].position[1] = f32::min(0.95, f32::max(-0.95, self.vertices[cur].position[1]));
         }
         self.sim_temperature *= self.sim_cooldown;
         return true;

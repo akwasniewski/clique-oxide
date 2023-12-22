@@ -1,4 +1,5 @@
 use crate::graph::*;
+use srgb::gamma::linear_from_u8;
 impl Graph{
     pub fn size(&self)->usize{
         self.size
@@ -18,8 +19,8 @@ impl Graph{
     pub fn add_edge(&mut self, from: usize, to: usize){
         self.vertices[from].connections.insert(to);
     }
-    pub fn change_color(&mut self, edge_index: usize, color: [f32; 3]){
-        self.vertices[edge_index].color=color;
+    pub fn set_color(&mut self, edge_index: usize, color: [u8; 3]){
+        self.vertices[edge_index].color=linear_from_u8(color);
     }
     pub fn get(&self) -> (Vec<VisualVertex>, Vec<u16>){
         let mut visual_vertices: Vec<VisualVertex> = Vec::new();

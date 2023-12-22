@@ -19,7 +19,7 @@ impl Graph{
                     graph.add_edge(i,j);
                 }
             }
-            graph.change_color(i, [rng.gen_range(0.0..1.0), rng.gen_range(0.0..1.0),rng.gen_range(0.0.. 1.1)])
+            graph.set_color(i, [rng.gen_range(0..=255), rng.gen_range(0..=255),rng.gen_range(0..=255)])
         }
         graph
     }
