@@ -79,13 +79,13 @@ impl Graph{
         delta*delta/self.vertex_density
     }
     pub (crate) fn adjust_positions(&mut self) ->bool {
-        if(self.sim_temperature<0.00001){
+        if self.sim_temperature<0.00001{
             return false;
         }
         let mut rng = rand::thread_rng();
         let graph_size = self.vertices.len();
         let mut forces: Vec<[f32; 2]> = Vec::with_capacity(graph_size);
-        for i in 0..graph_size {
+        for _ in 0..graph_size {
             forces.push([0.0, 0.0]);
         }
         if rng.gen_range(0..20) == 0 {
@@ -94,7 +94,6 @@ impl Graph{
         self.calculate_repulsion(&mut forces);
         self.calculate_attraction(&mut forces);
         for cur in 0..graph_size {
-            let force = (forces[cur][0].powf(2.0) + forces[cur][1].powf(2.0)).sqrt();
             self.vertices[cur].position[0] += forces[cur][0] * self.sim_temperature;
             self.vertices[cur].position[0] = f32::min(950.0, f32::max(-950.0, self.vertices[cur].position[0]));
             self.vertices[cur].position[1] += forces[cur][1] * self.sim_temperature;

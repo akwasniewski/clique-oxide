@@ -4,10 +4,8 @@ use winit::{
     window::WindowBuilder,
 };
 mod state;
-pub mod draw;
 pub mod graph;
 use crate::state::State;
-use wgpu::util::DeviceExt;
 use crate::visual_vertex::VisualVertex;
 use crate::graph::*;
 pub async fn run(mut graph: Graph) {
@@ -19,7 +17,7 @@ pub async fn run(mut graph: Graph) {
     let mut state = State::new(window, vertices, indices).await;
 // run()
     event_loop.run(move |event, _, control_flow| {
-        if(graph.adjust_positions()){
+        if graph.adjust_positions(){
             let(vertices, indices) = graph.get();
             state.update_positions(vertices, indices);
         }

@@ -1,5 +1,6 @@
 use std::collections::{HashSet};
 use rand::Rng;
+#[allow(unused)]
 pub struct GraphVertex{
     pub (crate) label: usize,
     pub (crate) position: [f32; 3],

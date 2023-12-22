@@ -30,8 +30,9 @@ impl State {
     pub fn window(&self) -> &Window {
         &self.window
     }
-
+    #[allow(unused)]
     pub(crate) fn input(&mut self, event: &WindowEvent) -> bool {
+        //todo!();
         false
     }
     pub (crate) fn update(&self){}
@@ -76,8 +77,6 @@ impl State {
 
         Ok(())
     }
-}
-impl State {
     // ...
     pub(crate) async fn new(window: Window, vertices: Vec<VisualVertex>, indices: Vec<u16>) -> Self {
         let size = window.inner_size();

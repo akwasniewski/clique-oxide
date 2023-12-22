@@ -1,9 +1,11 @@
 pub mod graph_vertex;
+pub(crate) mod visual_vertex;
+
+mod setters;
+mod algorithm;
 use rand::Rng;
 use std::vec::Vec;
 use crate::graph::graph_vertex::GraphVertex;
-mod algorithm;
-pub(crate) mod visual_vertex;
 use crate::graph::visual_vertex::VisualVertex;
 pub struct Graph{
     pub size: usize,
@@ -12,28 +14,24 @@ pub struct Graph{
     pow_density: f32,
     vertex_size: f32,
     edge_width: f32,
-    sim_runs: i32,
     sim_cooldown: f32,
     sim_temperature: f32,
-    display_length: i32,
-    display_height: i32,
     vertex_density: f32,
 }
 impl Graph{
+    #[allow(unused)]
     pub fn new(size: usize) -> Self{
         let mut vertices=Vec::new();
-        let mut sqrt_size = (size as f32).sqrt();
+        let sqrt_size = (size as f32).sqrt();
         //setting default display options
         let mut vertex_size:f32=1.0/100.0;
         let mut edge_width:f32=5.0/1000.0;
         //setting default simulation options
-        let mut sim_runs:i32=100000;
         let mut sim_cooldown:f32=0.9995;
         let mut sim_temperature=0.003;
-        let mut display_length:i32=2000;
-        let mut display_height:i32=2000;
-        let mut vertex_density:f32= ((display_height * display_length) as f32).sqrt()/(size as f32);
-        let mut pow_density = vertex_density*vertex_density;
+
+        let vertex_density:f32= ((2000 * 2000) as f32).sqrt()/(size as f32);
+        let pow_density = vertex_density*vertex_density;
         for i in 0..size{
             vertices.push(GraphVertex::new(i));
         }
@@ -42,47 +40,12 @@ impl Graph{
             vertices,
             vertex_size,
             edge_width,
-            sim_runs,
             sim_cooldown,
             sim_temperature,
-            display_height,
-            display_length,
             vertex_density,
             pow_density,
             sqrt_size,
         }
-    }
-    pub fn from_snap(snap: &str, nodes: usize)->Graph{
-        let split = snap.split_whitespace();
-        let collected: Vec<usize> = split.map(|x| x.parse().unwrap()).collect();
-        let mut res: Graph = Graph::new(nodes);
-        for i in (0..collected.len()).step_by(2) {
-            res.add_edge(collected[i]-1, collected[i + 1]-1);
-        }
-        res
-    }
-    pub fn set_temperature(&mut self, new_temperature: f32){
-        self.sim_temperature=new_temperature;
-    }
-    pub fn set_vertex_size(&mut self, vertex_size: f32){
-        self.vertex_size=vertex_size/100.0;
-    }
-    pub fn set_edge_with(&mut self, edge_width: f32){
-        self.edge_width=edge_width/200.0;
-    }
-    pub fn add_edge(&mut self, from: usize, to: usize){
-        self.vertices[from].connections.insert(to);
-    }
-    pub fn change_color(&mut self, edge_index: usize, color: [f32; 3]){
-        self.vertices[edge_index].color=color;
-    }
-    pub fn get(&self) -> (Vec<VisualVertex>, Vec<u16>){
-        let mut visual_vertices: Vec<VisualVertex> = Vec::new();
-        let mut indices: Vec<u16> = Vec::new();
-        let mut cur_indice=0;
-        self.generate_edges(&mut visual_vertices, &mut indices, &mut cur_indice);
-        self.generate_visual_vertices(&mut visual_vertices, &mut indices, &mut cur_indice);
-        (visual_vertices, indices)
     }
     fn generate_visual_vertices(&self, visual_vertices: &mut Vec<VisualVertex>, indices: &mut Vec<u16>, cur_indice: &mut u16){
         for cur in &self.vertices{
@@ -100,9 +63,6 @@ impl Graph{
             indices.push(*cur_indice+3); //bottom right
             *cur_indice+=4;
         }
-    }
-    pub fn size(&self)->usize{
-        self.size
     }
     fn generate_edges(&self, visual_vertices: &mut Vec<VisualVertex>, indices: &mut Vec<u16>, cur_indice: &mut u16){
         for cur in &self.vertices {
