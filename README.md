@@ -8,8 +8,9 @@ to deliver lightweight graph visualizations
 - ✅ Node coloring
 - 🔨 Implementing drawing using Tutte embeddings 
 - 🔨 Handling not connected graphs
-- 🚧 3D graph drawing, and 3D camera
-- 🚧 Online graph building, and coloring
+- 💡 3D graph drawing, and 3D camera
+- 💡 Online graph building, and coloring
+- 💡 Implementing c/c++ interface, so I can use it in my uni problems debugging
 
 ## Usage
 Version 0.1.0 is not yet released, neither are the docs, if you want you can clone the repository and play around,
