@@ -29,7 +29,7 @@ impl Graph{
         //setting default simulation options
         let mut sim_runs:i32=100000;
         let mut sim_cooldown:f32=0.9995;
-        let mut sim_temperature=0.001;
+        let mut sim_temperature=0.003;
         let mut display_length:i32=2000;
         let mut display_height:i32=2000;
         let mut vertex_density:f32= ((display_height * display_length) as f32).sqrt()/(size as f32);

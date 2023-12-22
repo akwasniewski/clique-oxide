@@ -96,9 +96,9 @@ impl Graph{
         for cur in 0..graph_size {
             let force = (forces[cur][0].powf(2.0) + forces[cur][1].powf(2.0)).sqrt();
             self.vertices[cur].position[0] += forces[cur][0] * self.sim_temperature;
-            self.vertices[cur].position[0] = f32::min(1000.0, f32::max(-1000.0, self.vertices[cur].position[0]));
+            self.vertices[cur].position[0] = f32::min(950.0, f32::max(-950.0, self.vertices[cur].position[0]));
             self.vertices[cur].position[1] += forces[cur][1] * self.sim_temperature;
-            self.vertices[cur].position[1] = f32::min(1000.0, f32::max(-1000.0, self.vertices[cur].position[1]));
+            self.vertices[cur].position[1] = f32::min(950.0, f32::max(-950.0, self.vertices[cur].position[1]));
         }
         self.sim_temperature *= self.sim_cooldown;
         return true;
