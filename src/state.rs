@@ -18,7 +18,7 @@ pub struct State {
 impl State {
     // Creating some of the wgpu types requires async code
     pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
-        if new_size.width > 0 && new_size.height > 0 {
+        if new_size.width > 0 && new_size.height > 0 && new_size.width<=8192 && new_size.height<=8192 {
             self.size = new_size;
             self.config.width = new_size.width;
             self.config.height = new_size.height;
@@ -46,13 +46,29 @@ impl State {
         let mut encoder = self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
             label: Some("Render Encoder"),
         });
+        let msaa_texture_descriptor = wgpu::TextureDescriptor {
+            label: Some("MSAA Texture"),
+            size: wgpu::Extent3d {
+                width: self.config.width,
+                height: self.config.height,
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 4,
+            dimension: wgpu::TextureDimension::D2,
+            format: self.config.format,
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+            view_formats: &[self.config.format],
+        };
+        let msaa_texture = self.device.create_texture(&msaa_texture_descriptor);
+        let msaa_texture_view = msaa_texture.create_view(&wgpu::TextureViewDescriptor::default());
         let [rc,gc,bc] = linear_from_u8([84,153,132]);
         {
             let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Render Pass"),
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &view,
-                    resolve_target: None,
+                    view: &msaa_texture_view,
+                    resolve_target: Some(&view),
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
                             r: rc as f64,
@@ -176,7 +192,7 @@ impl State {
             },
             depth_stencil: None, // 1.
             multisample: wgpu::MultisampleState {
-                count: 1, // 2.
+                count: 4, // 2.
                 mask: !0, // 3.
                 alpha_to_coverage_enabled: false, // 4.
             },
