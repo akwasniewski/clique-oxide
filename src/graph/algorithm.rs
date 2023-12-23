@@ -88,9 +88,9 @@ impl Graph{
         for _ in 0..graph_size {
             forces.push([0.0, 0.0]);
         }
-        // if self.sim_temperature>0.0001 && rng.gen_range(0..20) == 0 {
-        //     self.handle_collinearities();
-        // }
+        if self.sim_temperature>0.0001 && rng.gen_range(0..20) == 0 {
+            self.handle_collinearities();
+        }
         self.calculate_repulsion(&mut forces);
         self.calculate_attraction(&mut forces);
         for cur in 0..graph_size {
